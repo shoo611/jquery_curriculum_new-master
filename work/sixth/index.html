@@ -15,7 +15,64 @@
   </div>
   <script src="../../common/js/jquery.js"></script>
   <script>
-    // 回答はここに書いてね
+    $(function () {
+      let topButton = `<button type="button" class="btn search-btn" id="pokemon_search">ポケモンを探す</button>`;
+      let doneHtml =
+      `
+      <p class="name">ゲットしました</p>
+      <div>
+        <img class="img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/items/poke-ball.png" alt="">
+      </div>
+      <button class="btn" data-js="reset">戻る</button>
+      `;
+      let failHtml =
+      `
+      <p class="text">逃げられてしまった...</p>
+      <button class="btn mt" data-js="reset">戻る</button>
+      `;
+
+      function pokemonSearch() {
+      $('#pokemon_search').click(function () {
+        let id = Math.floor(Math.random() * 151) + 1;
+        let url = `https://pokeapi.co/api/v2/pokemon-species/${id}`;
+        let encountHtml =
+        `
+        <p class="name"></p>
+        <div>
+          <img class="img" src="https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${id}.png" alt="">
+        </div>
+        <div>
+          <button class="btn" id="catch">捕まえる</button>
+          <button class="btn" data-js="reset">逃げる</button>
+        </div>
+        `;
+        $.ajax({
+          url,
+          method: 'GET'
+        }).done(function (res) {
+          console.log(res);
+          $('#wrapper').html(encountHtml);
+          let name = res.names.find(name => name.language.name === 'ja').name;
+          $('.name').text(name);
+        }).fail(function (err) {
+          console.error('エラーが発生しました');
+        });
+      });}
+
+      $(document).on('click', '#catch', function () {
+        let doneOrFail = Math.floor(Math.random() * 2);
+        if (doneOrFail === 0) {
+          $('#wrapper').html(doneHtml);
+        } else {
+          $('#wrapper').html(failHtml);
+        }
+      });
+      $(document).on('click', '[data-js="reset"]', function () {
+        $('#wrapper').empty()
+                     .append(topButton);
+      });
+      $(document).on('click', '#pokemon_search', pokemonSearch);
+    });
   </script>
 </body>
 </html>
